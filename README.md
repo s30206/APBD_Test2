@@ -17,4 +17,4 @@ Create a file named `appsettings.json` inside the `src/APBD_Test2.API` folder wi
 }
 </pre>
 
-In the `Database` field, provide your connection string to the Microsoft SQL Server instance.\
+In the `Database` field, provide your connection string to the Microsoft SQL Server instance.

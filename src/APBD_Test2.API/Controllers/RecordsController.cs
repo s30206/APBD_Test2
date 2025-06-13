@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using WebApplication1;
 using WebApplication1.DTOs;
 using WebApplication1.Interfaces;
@@ -22,20 +23,20 @@ namespace WebApplication1.Controllers
             _service = service;
         }
 
-        /*// GET: api/Languages
+        // GET: api/Languages
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Record>>> GetRecords([FromQuery] string? sortBy)
+        public async Task<ActionResult<IEnumerable<RecordResponseDTO>>> GetRecords(GetRecordDTO? request)
         {
             try
             {
-                var result = await _service.GetAllRecords(sortBy);
+                var result = await _service.GetAllRecords(request);
                 return result.IsNullOrEmpty() ? NoContent() : Ok(result);
             }
             catch (Exception ex)
             {
                 return Problem(ex.Message);
             }
-        }*/
+        }
 
         // POST: api/Languages
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
