@@ -25,7 +25,7 @@ namespace WebApplication1.Controllers
 
         // GET: api/Languages
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<RecordResponseDTO>>> GetRecords(GetRecordDTO? request)
+        public async Task<ActionResult<IEnumerable<RecordResponseDTO>>> GetRecords([FromHeader] GetRecordDTO? request)
         {
             try
             {
