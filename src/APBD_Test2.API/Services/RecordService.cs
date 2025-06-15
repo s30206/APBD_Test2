@@ -47,29 +47,17 @@ public class RecordService : IRecordService
 
         if (request != null)
         {
+            if (request.LanguageId != null && request.TaskId != null)
+                return records.Where(r => r.Language.Id == request.LanguageId && r.Task.Id == request.TaskId).ToList();
+            
             if (request.LanguageId != null)
-            {
-                var result = new List<RecordResponseDTO>();
-                foreach (var record in records)
-                {
-                    if (record.Language.Id == request.LanguageId)
-                        result.Add(record);
-                }
-
-                return result;
-            }
-
+                return records.Where(r => r.Language.Id == request.LanguageId).ToList();
+            
+            if (request.TaskId != null)
+                return records.Where(r => r.Task.Id == request.TaskId).ToList();
+            
             if (request.Created != null)
-            {
-                var result = new List<RecordResponseDTO>();
-                foreach (var record in records)
-                {
-                    if (record.Created == request.Created)
-                        result.Add(record);
-                }
-
-                return result;
-            }
+                return records.Where(r => r.Created == request.ParseDate()).ToList();
         }
 
         return records.ToList();
@@ -85,9 +73,12 @@ public class RecordService : IRecordService
         if (student == null)
             throw new KeyNotFoundException("Student with given id not found");
 
-        var task = await _context.Tasks.FindAsync(request.Task.Id);
+        var task = await _context.Tasks.FindAsync(request.TaskId);
         if (task == null)
         {
+            if (request.Task == null) 
+                throw new KeyNotFoundException("Task with given id not found");
+            
             var newTask = new Task()
             {
                 Name = request.Task.Name,
@@ -97,7 +88,7 @@ public class RecordService : IRecordService
             await _context.SaveChangesAsync();
         }
         
-        task = await _context.Tasks.FirstOrDefaultAsync(t => t.Name == request.Task.Name);
+        task = await _context.Tasks.FirstOrDefaultAsync(t => t.Id == request.TaskId);
 
         var record = new Record()
         {
@@ -105,7 +96,7 @@ public class RecordService : IRecordService
             LanguageId = language.Id,
             TaskId = task.Id,
             ExecutionTime = request.ExecutionTime,
-            CreatedAt = request.Created
+            CreatedAt = request.ParseDate()
         };
         
         _context.Records.Add(record);

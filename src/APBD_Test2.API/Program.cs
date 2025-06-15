@@ -14,7 +14,7 @@ builder.Services.AddSwaggerGen();
 
 var connectionString = builder.Configuration.GetConnectionString("Database") ?? throw new Exception("Database connection string not found");
 builder.Services.AddDbContext<RecordManiaContext>(options => options.UseSqlServer(connectionString));
-builder.Services.AddTransient<IRecordService, RecordService>();
+builder.Services.AddScoped<IRecordService, RecordService>();
 
 var app = builder.Build();
 

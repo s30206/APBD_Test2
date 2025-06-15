@@ -12,7 +12,7 @@ using WebApplication1.Interfaces;
 
 namespace WebApplication1.Controllers
 {
-    [Route("api/languages")]
+    [Route("api/records")]
     [ApiController]
     public class RecordsController : ControllerBase
     {
@@ -25,12 +25,12 @@ namespace WebApplication1.Controllers
 
         // GET: api/Languages
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<RecordResponseDTO>>> GetRecords([FromHeader] GetRecordDTO? request)
+        public async Task<ActionResult<IEnumerable<RecordResponseDTO>>> GetRecords([FromQuery] GetRecordDTO? request)
         {
             try
             {
                 var result = await _service.GetAllRecords(request);
-                return result.IsNullOrEmpty() ? NoContent() : Ok(result);
+                return Ok(result);
             }
             catch (Exception ex)
             {
