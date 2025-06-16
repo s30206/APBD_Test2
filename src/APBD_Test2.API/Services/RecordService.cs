@@ -15,12 +15,28 @@ public class RecordService : IRecordService
 
     public async Task<List<RecordResponseDTO>> GetAllRecords(GetRecordDTO? request)
     {
-        var records = _context.Records
+        var query = _context.Records
             .Include(r => r.Task)
             .Include(r => r.Student)
             .Include(r => r.Language)
+            .AsQueryable();
+
+        if (request != null)
+        {
+            if (request.LanguageId != null)
+                query = query.Where(r => r.Language.Id == request.LanguageId);
+
+            if (request.TaskId != null)
+                query = query.Where(r => r.Task.Id == request.TaskId);
+
+            if (request.Created != null)
+                query = query.Where(r => r.CreatedAt == request.ParseDate());
+        }
+
+        var records = await query
             .OrderByDescending(r => r.CreatedAt)
-            .ThenBy(r => r.Student.LastName).Select(r => new RecordResponseDTO
+            .ThenBy(r => r.Student.LastName)
+            .Select(r => new RecordResponseDTO
             {
                 Id = r.Id,
                 Language = new LanguageDTO
@@ -43,24 +59,9 @@ public class RecordService : IRecordService
                 },
                 ExecutionTime = r.ExecutionTime,
                 Created = r.CreatedAt
-            });
+            }).ToListAsync();
 
-        if (request != null)
-        {
-            if (request.LanguageId != null && request.TaskId != null)
-                return records.Where(r => r.Language.Id == request.LanguageId && r.Task.Id == request.TaskId).ToList();
-            
-            if (request.LanguageId != null)
-                return records.Where(r => r.Language.Id == request.LanguageId).ToList();
-            
-            if (request.TaskId != null)
-                return records.Where(r => r.Task.Id == request.TaskId).ToList();
-            
-            if (request.Created != null)
-                return records.Where(r => r.Created == request.ParseDate()).ToList();
-        }
-
-        return records.ToList();
+        return records;
     }
 
     public async Task<Record> InsertRecord(InsertRecordDTO request)
@@ -88,13 +89,11 @@ public class RecordService : IRecordService
             await _context.SaveChangesAsync();
         }
         
-        task = await _context.Tasks.FirstOrDefaultAsync(t => t.Id == request.TaskId);
-
         var record = new Record()
         {
             StudentId = student.Id,
             LanguageId = language.Id,
-            TaskId = task.Id,
+            TaskId = request.TaskId,
             ExecutionTime = request.ExecutionTime,
             CreatedAt = request.ParseDate()
         };
